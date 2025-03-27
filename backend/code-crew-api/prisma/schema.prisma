@@ -1,0 +1,91 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id  String @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email String @unique
+  hash String
+
+  firstName String
+  lastName String
+
+  projects Project[]
+  roles Role[]
+  Application Application[]
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publishedAt DateTime?
+
+  title String
+  description String
+  
+  owner String
+  isPublished Boolean @default(false)
+
+  user User @relation(fields: [owner], references: [id], onDelete: Cascade)
+  
+  roles Role[]
+  applications Application[]
+
+}
+
+model Role {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  description String
+  isAssigned Boolean
+
+  assignee String
+  projectId Int
+
+  user User @relation(fields: [assignee], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  Application Application[]
+
+}
+
+model Application {
+  id  Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  message String
+  status ApplicationStatus @default(PENDING)
+
+  applicant String
+  projectId Int
+  roleId Int
+
+  user User @relation(fields: [applicant], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade) 
+
+}
+
+enum ApplicationStatus {
+  ACCEPTED
+  PENDING
+  REJECTED
+}
+
+// Projects: title, description, roles, published, owner, deadline, applications
+// User: email, password, fname, lname, projects, roles, applications, saved/favourites
+// Role: title, description, taken, assignedTo, project
+// Application: applicant, message, project, role, status
