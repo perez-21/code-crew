@@ -28,13 +28,18 @@ export class ProjectsController {
   }
 
   @Get()
-  async findAll(@GetUser() user: { user_id: string }) {
-    return await this.projectsService.findAll(user.user_id);
+  async findAll() {
+    return await this.projectsService.findAll();
   }
 
   @Get(':id')
   async findOne(@GetUser() user: { user_id: string }, @Param('id') id: string) {
     return await this.projectsService.findOne(user.user_id, +id);
+  }
+
+  @Get(':id/roles') // TODO: Make sure User owns project
+  async findAllRoles(@Param('id') id: number) {
+    return await this.projectsService.findAllRoles(+id);
   }
 
   @Patch(':id')

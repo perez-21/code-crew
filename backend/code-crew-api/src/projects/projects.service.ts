@@ -23,8 +23,12 @@ export class ProjectsService {
     });
   }
 
-  async findAll(owner: string) {
-    return await this.prismaService.project.findMany({ where: { owner } });
+  async findAll() {
+    return await this.prismaService.project.findMany();
+  }
+
+  async findAllRoles(projectId: number) {
+    return await this.prismaService.role.findMany({ where: { projectId } });
   }
 
   async findOne(owner: string, id: number) {
@@ -36,6 +40,7 @@ export class ProjectsService {
   async update(owner: string, id: number, updateProjectDto: UpdateProjectDto) {
     let publishedAt: Date | null = null;
     if (updateProjectDto.isPublished) {
+      // TODO: Fix bug
       publishedAt = new Date();
     }
     return await this.prismaService.project.update({

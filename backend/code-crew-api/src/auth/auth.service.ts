@@ -1,18 +1,19 @@
 import {
   ForbiddenException,
   Injectable,
-  UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { SignInDto, SignUpDto } from './dtos';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly userService: UsersService,
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -20,34 +21,22 @@ export class AuthService {
   async signup(authDto: SignUpDto) {
     // hash password
 
-    const hash = await argon.hash(authDto.password);
+    const hash = await this.hash(authDto.password);
+    authDto.password = hash;
 
     try {
-      const user = await this.prismaService.user.create({
-        data: {
-          firstName: authDto.firstname,
-          lastName: authDto.lastname,
-          email: authDto.email,
-          hash,
-        },
-        select: {
-          hash: false,
-          firstName: true,
-          lastName: true,
-          email: true,
-          id: true,
-        },
-      });
+      const user = await this.userService.create(authDto);
+
+      if (!user) {
+        throw new InternalServerErrorException();
+      }
 
       return this.signToken(user.id, user.email);
     } catch (error) {
-      if (error instanceof PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
-        }
-
-        throw error;
+      if (error instanceof ForbiddenException) {
+        throw new ForbiddenException('Credentials taken');
       }
+      throw error;
     }
   }
 
@@ -79,5 +68,9 @@ export class AuthService {
       },
     );
     return { access_token };
+  }
+
+  async hash(password: string) {
+    return await argon.hash(password);
   }
 }
