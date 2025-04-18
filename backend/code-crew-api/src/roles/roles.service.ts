@@ -6,16 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class RolesService {
   constructor(private readonly prismaService: PrismaService) {}
-  async create(owner: string, createRoleDto: CreateRoleDto) {
-    let assignee: string;
-    if (createRoleDto.isAssigned) {
-      assignee = createRoleDto.assignee;
-    } else {
-      assignee = owner;
-    }
-
-    createRoleDto.assignee = assignee;
-
+  async create(createRoleDto: CreateRoleDto) {
     return await this.prismaService.role.create({ data: createRoleDto });
   }
 

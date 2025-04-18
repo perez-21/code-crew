@@ -24,7 +24,9 @@ export class ProjectsService {
   }
 
   async findAll() {
-    return await this.prismaService.project.findMany();
+    return await this.prismaService.project.findMany({
+      where: { isPublished: true },
+    });
   }
 
   async findAllRoles(projectId: number) {

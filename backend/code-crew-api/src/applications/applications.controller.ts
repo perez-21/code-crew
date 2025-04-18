@@ -36,6 +36,7 @@ export class ApplicationsController {
     return await this.applicationsService.findAll();
   }
 
+  // TODO: Only applicant and receiver should be able to see this
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.applicationsService.findOne(+id);

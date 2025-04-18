@@ -39,7 +39,6 @@ model Project {
   user User @relation(fields: [owner], references: [id], onDelete: Cascade)
   
   roles Role[]
-  applications Application[]
 
 }
 
@@ -52,10 +51,10 @@ model Role {
   description String
   isAssigned Boolean
 
-  assignee String
+  assignee String? 
   projectId Int
 
-  user User @relation(fields: [assignee], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [assignee], references: [id], onDelete: Cascade)
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   Application Application[]
@@ -70,11 +69,9 @@ model Application {
   status ApplicationStatus @default(PENDING)
 
   applicant String
-  projectId Int
   roleId Int
 
   user User @relation(fields: [applicant], references: [id], onDelete: Cascade)
-  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade) 
 
 }

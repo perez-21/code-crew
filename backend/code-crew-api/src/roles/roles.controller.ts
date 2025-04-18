@@ -20,11 +20,8 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  async create(
-    @GetUser() user: { user_id: string },
-    @Body() createRoleDto: CreateRoleDto,
-  ) {
-    return await this.rolesService.create(user.user_id, createRoleDto);
+  async create(@Body() createRoleDto: CreateRoleDto) {
+    return await this.rolesService.create(createRoleDto);
   }
 
   @UseGuards(NeverGuard)
