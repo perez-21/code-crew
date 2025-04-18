@@ -5,14 +5,6 @@ export class CreateApplicationDto {
   @IsString()
   message: string;
 
-  @IsNotEmpty()
-  @IsString()
-  applicant: string;
-
-  @IsNumber()
-  @Min(1)
-  projectId: number;
-
   @IsNumber()
   @Min(1)
   roleId: number;

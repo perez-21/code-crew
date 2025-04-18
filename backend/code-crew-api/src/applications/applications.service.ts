@@ -8,9 +8,8 @@ import { NeverGuard } from 'src/auth/guards';
 export class ApplicationsService {
   constructor(private readonly prismaService: PrismaService) {}
   async create(applicant: string, createApplicationDto: CreateApplicationDto) {
-    createApplicationDto.applicant = applicant;
     return this.prismaService.application.create({
-      data: createApplicationDto,
+      data: { ...createApplicationDto, applicant },
     });
   }
 
